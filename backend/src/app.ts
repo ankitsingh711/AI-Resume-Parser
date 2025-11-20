@@ -5,8 +5,7 @@ import uploadRoutes from './routes/uploadRoutes';
 import chatRoutes from './routes/chatRoutes';
 import testRoutes from './routes/testRoutes';
 import { errorHandler } from './middleware/errorHandler';
-import { EmbeddingService } from './services/embeddingService';
-import { VectorStore } from './services/vectorStore';
+import { KeywordSearchService } from './services/keywordSearchService';
 import { RAGService } from './services/ragService';
 import { AnalysisService } from './services/analysisService';
 
@@ -24,20 +23,13 @@ export function createApp(): Express {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
-    // Validate required environment variables
-    if (!process.env.GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY environment variable is required');
-    }
-
-    // Initialize services with Google Gemini
-    const embeddingService = new EmbeddingService(process.env.GEMINI_API_KEY);
-    const vectorStore = new VectorStore(embeddingService);
-    const ragService = new RAGService(process.env.GEMINI_API_KEY, vectorStore);
-    const analysisService = new AnalysisService(process.env.GEMINI_API_KEY);
+    // Initialize services - ALL LOCAL, NO API KEYS NEEDED!
+    const searchService = new KeywordSearchService();
+    const ragService = new RAGService('not-needed', searchService);
+    const analysisService = new AnalysisService();
 
     // Make services available to routes
-    app.locals.embeddingService = embeddingService;
-    app.locals.vectorStore = vectorStore;
+    app.locals.searchService = searchService;
     app.locals.ragService = ragService;
     app.locals.analysisService = analysisService;
 
@@ -48,12 +40,12 @@ export function createApp(): Express {
 
     // Health check
     app.get('/api/health', (_req, res) => {
-        const stats = vectorStore.getStats();
+        const stats = searchService.getStats();
         res.json({
             status: 'ok',
             timestamp: new Date().toISOString(),
-            vectorStore: stats,
-            ai: 'Google Gemini Pro',
+            searchEngine: stats,
+            ai: 'Local Rule-Based AI (100% Free, No APIs!)',
         });
     });
 

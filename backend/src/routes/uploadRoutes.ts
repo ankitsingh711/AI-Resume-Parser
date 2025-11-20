@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { DocumentParser } from '../services/documentParser';
 import { TextChunker } from '../services/textChunker';
-import { VectorStore } from '../services/vectorStore';
+import { KeywordSearchService } from '../services/keywordSearchService';
 import { AnalysisService } from '../services/analysisService';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 
@@ -157,7 +157,7 @@ router.post(
         }
 
         // Get services from app locals (set in app.ts)
-        const vectorStore: VectorStore = req.app.locals.vectorStore;
+        const searchService: KeywordSearchService = req.app.locals.searchService;
         const analysisService: AnalysisService = req.app.locals.analysisService;
 
         // Create text chunker
@@ -166,8 +166,19 @@ router.post(
         // Chunk the resume
         const chunks = textChunker.chunkDocument(session.resume.text, 'resume');
 
-        // Add chunks to vector store
-        await vectorStore.addDocuments(chunks, sessionId);
+        // Convert chunks to format expected by search service
+        const searchChunks = chunks.map((chunk, index) => ({
+            text: chunk.text,
+            metadata: {
+                chunkType: chunk.metadata.chunkType,
+                chunkIndex: index,
+                source: 'resume',
+                resumeId: sessionId,
+            },
+        }));
+
+        // Add chunks to search service (no API calls needed!)
+        await searchService.addDocuments(sessionId, searchChunks);
 
         // Perform analysis
         const analysis = await analysisService.analyzeMatch(
@@ -215,9 +226,9 @@ router.delete(
             // Remove from memory
             uploadedFiles.delete(sessionId);
 
-            // Clear from vector store
-            const vectorStore: VectorStore = req.app.locals.vectorStore;
-            vectorStore.deleteByResumeId(sessionId);
+            // Clear from search service
+            const searchService: KeywordSearchService = req.app.locals.searchService;
+            searchService.deleteByResumeId(sessionId);
         }
 
         res.json({

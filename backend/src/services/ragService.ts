@@ -1,9 +1,8 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { VectorStore, SearchResult } from './vectorStore';
+import { KeywordSearchService, SearchResult } from './keywordSearchService';
 
 export interface ChatMessage {
-    role: 'user' | 'model';
-    parts: string;
+    role: 'user' | 'assistant';
+    content: string;
 }
 
 export interface RAGResponse {
@@ -17,22 +16,20 @@ export interface RAGResponse {
 }
 
 /**
- * RAG Service implementing the full Retrieval-Augmented Generation flow
- * Now using Google Gemini for generation
+ * Local RAG Service - NO API NEEDED!
+ * Uses keyword search + template-based responses
  */
 export class RAGService {
-    private genAI: GoogleGenerativeAI;
-    private vectorStore: VectorStore;
+    private searchService: KeywordSearchService;
     private conversations: Map<string, ChatMessage[]> = new Map();
 
-    constructor(apiKey: string, vectorStore: VectorStore) {
-        this.genAI = new GoogleGenerativeAI(apiKey);
-        this.vectorStore = vectorStore;
+    constructor(_apiKey: string, searchService: KeywordSearchService) {
+        this.searchService = searchService;
+        // API key not used - keeping for interface compatibility
     }
 
     /**
-     * Main RAG query method
-     * Flow: Question → Embedding → Vector Search → Retrieve Context → LLM Generate
+     * Main RAG query method - completely local!
      */
     async query(
         question: string,
@@ -40,44 +37,22 @@ export class RAGService {
         conversationId: string
     ): Promise<RAGResponse> {
         try {
-            // Step 1: Retrieve relevant context from vector store
-            const searchResults = await this.vectorStore.search(question, 5, { resumeId });
+            // Step 1: Retrieve relevant context using keyword search
+            const searchResults = await this.searchService.search(question, 5, { resumeId });
 
-            // Step 2: Extract context from search results
-            const context = this.buildContext(searchResults);
+            // Step 2: Generate answer based on context
+            const answer = this.generateAnswer(question, searchResults);
 
-            // Step 3: Get or create conversation history
-            const conversationHistory = this.getConversationHistory(conversationId);
-
-            // Step 4: Build system instruction with context
-            const systemInstruction = this.buildSystemInstruction(context);
-
-            // Step 5: Generate response using Gemini
-            const model = this.genAI.getGenerativeModel({
-                model: 'gemini-pro',
-                systemInstruction,
-            });
-
-            // Convert history to Gemini format
-            const history = conversationHistory.map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.parts }],
-            }));
-
-            const chat = model.startChat({ history });
-            const result = await chat.sendMessage(question);
-            const answer = result.response.text();
-
-            // Step 6: Update conversation history
+            // Step 3: Update conversation history
             this.updateConversationHistory(conversationId, question, answer);
 
-            // Step 7: Return response with sources
+            // Step 4: Return response with sources
             return {
                 answer,
                 sources: searchResults.map((result) => ({
-                    text: result.document.text,
+                    text: result.text,
                     score: result.score,
-                    chunkType: result.document.metadata.chunkType,
+                    chunkType: result.metadata.chunkType,
                 })),
                 conversationId,
             };
@@ -87,45 +62,153 @@ export class RAGService {
     }
 
     /**
-     * Build context string from search results
+     * Generate answer based on retrieved context
      */
-    private buildContext(searchResults: SearchResult[]): string {
+    private generateAnswer(question: string, searchResults: SearchResult[]): string {
         if (searchResults.length === 0) {
-            return 'No relevant information found in the resume.';
+            return "I don't have enough information in the resume to answer that question. The resume may not contain details about this topic.";
         }
 
-        const contextParts = searchResults.map((result, index) => {
-            return `[Source ${index + 1}] (Relevance: ${(result.score * 100).toFixed(1)}%)\n${result.document.text}`;
-        });
+        const context = searchResults.map(r => r.text).join('\n\n');
+        const questionLower = question.toLowerCase();
 
-        return contextParts.join('\n\n');
+        // Question type detection and answer generation
+        if (questionLower.includes('degree') || questionLower.includes('education') || questionLower.includes('university')) {
+            return this.answerEducationQuestion(context, question);
+        }
+
+        if (questionLower.includes('experience') || questionLower.includes('years')) {
+            return this.answerExperienceQuestion(context, question);
+        }
+
+        if (questionLower.includes('skill') || questionLower.includes('technology') || questionLower.includes('know')) {
+            return this.answerSkillsQuestion(context, question);
+        }
+
+        if (questionLower.includes('work') || questionLower.includes('company') || questionLower.includes('job')) {
+            return this.answerWorkHistoryQuestion(context, question);
+        }
+
+        if (questionLower.includes('citizen') || questionLower.includes('authorized') || questionLower.includes('visa')) {
+            return this.answerWorkAuthQuestion(context, question);
+        }
+
+        // Generic answer based on context
+        return this.generateGenericAnswer(context, question);
     }
 
-    /**
-     * Build system instruction for Gemini
-     */
-    private buildSystemInstruction(context: string): string {
-        return `You are an expert HR assistant helping recruiters evaluate candidates. 
+    private answerEducationQuestion(context: string, question: string): string {
+        const contextLower = context.toLowerCase();
 
-Your task is to answer questions about a candidate based ONLY on the information provided in their resume context below.
+        if (contextLower.includes('bachelor') || contextLower.includes('b.s') || contextLower.includes('bs ')) {
+            const eduMatch = context.match(/bachelor[^\n]*/i) || context.match(/b\.?s\.?\s+[^\n]*/i);
+            if (eduMatch) {
+                if (question.toLowerCase().includes('state university')) {
+                    if (contextLower.includes('state university') || contextLower.includes('suny')) {
+                        return `Yes, the candidate has a degree from a state university. ${eduMatch[0].trim()}`;
+                    }
+                    return `Based on the available information: ${eduMatch[0].trim()}. Please verify if this is from a state university.`;
+                }
+                return `Yes, the candidate has the following education: ${eduMatch[0].trim()}`;
+            }
+        }
 
-IMPORTANT RULES:
-1. Base your answers ONLY on the provided resume context
-2. If the information is not in the context, clearly state "This information is not available in the resume"
-3. Be specific and cite relevant details from the resume
-4. For yes/no questions, provide a clear answer followed by supporting evidence
-5. Maintain a professional, objective tone
-6. If you're uncertain, acknowledge it rather than guessing
+        if (contextLower.includes('master') || contextLower.includes('m.s') || contextLower.includes('ms ')) {
+            const eduMatch = context.match(/master[^\n]*/i);
+            if (eduMatch) {
+                return `Yes, the candidate has ${eduMatch[0].trim()}`;
+            }
+        }
 
-RESUME CONTEXT:
-${context}`;
+        return "The resume does not clearly specify education details in the available context.";
     }
 
-    /**
-     * Get conversation history
-     */
-    private getConversationHistory(conversationId: string): ChatMessage[] {
-        return this.conversations.get(conversationId) || [];
+    private answerExperienceQuestion(context: string, _question: string): string {
+        const yearMatches = context.match(/(\d+)\+?\s*(?:years?|yrs?)/i);
+        if (yearMatches) {
+            return `Based on the resume, the candidate has ${yearMatches[0]} of relevant experience.`;
+        }
+
+        const dateRanges = context.match(/(\d{4})\s*-\s*(?:present|\d{4})/gi);
+        if (dateRanges && dateRanges.length > 0) {
+            return `The candidate has worked from ${dateRanges[0]}, as mentioned in their experience section.`;
+        }
+
+        return "Specific years of experience are not clearly stated in this section of the resume.";
+    }
+
+    private answerSkillsQuestion(context: string, question: string): string {
+        const skills = ['react', 'node', 'python', 'java', 'javascript', 'typescript',
+            'aws', 'docker', 'kubernetes', 'sql', 'mongodb', 'postgresql'];
+
+        const foundSkills = skills.filter(skill => context.toLowerCase().includes(skill));
+
+        if (foundSkills.length > 0) {
+            return `Yes, the candidate has experience with${foundSkills.length > 1 ? ' multiple technologies including' : ''}: ${foundSkills.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}. Additional details can be found in the skills section.`;
+        }
+
+        // Check for specific skill mentioned in question
+        const questionWords = question.toLowerCase().split(/\s+/);
+        for (const word of questionWords) {
+            if (context.toLowerCase().includes(word) && word.length > 3) {
+                return `Yes, ${word} is mentioned in the candidate's experience or skills section.`;
+            }
+        }
+
+        return "This specific skill or technology is not explicitly mentioned in the available resume sections.";
+    }
+
+    private answerWorkHistoryQuestion(context: string, _question: string): string {
+        const companyMatch = context.match(/(?:at|@)\s+([A-Z][a-zA-Z\s&]+(?:Inc|LLC|Ltd|Corp|Company)?)/);
+        const titleMatch = context.match(/(senior|lead|staff|junior)?\s*(software|full[\s-]?stack|backend|frontend|web)\s*(engineer|developer)/i);
+
+        if (companyMatch && titleMatch) {
+            return `The candidate worked as a ${titleMatch[0]} at ${companyMatch[1].trim()}.`;
+        }
+
+        if (titleMatch) {
+            return `The candidate has experience as a ${titleMatch[0]}.`;
+        }
+
+        return "Work history details are available in the experience section. Here's a relevant excerpt: " + context.substring(0, 200) + "...";
+    }
+
+    private answerWorkAuthQuestion(context: string, _question: string): string {
+        const contextLower = context.toLowerCase();
+
+        if (contextLower.includes('citizen') || contextLower.includes('u.s. citizen') || contextLower.includes('us citizen')) {
+            return "Yes, the candidate indicates they are a U.S. Citizen and authorized to work in the United States.";
+        }
+
+        if (contextLower.includes('authorized') || contextLower.includes('authorization')) {
+            return "The candidate indicates they are authorized to work in the United States.";
+        }
+
+        if (contextLower.includes('h1b') || contextLower.includes('visa')) {
+            return "The resume mentions visa/sponsorship requirements. Please review work authorization details carefully.";
+        }
+
+        return "Work authorization status is not clearly specified in the available resume sections.";
+    }
+
+    private generateGenericAnswer(context: string, question: string): string {
+        // Extract most relevant sentence from context
+        const sentences = context.split(/[.!?]\s+/);
+        const questionWords = question.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+
+        let bestSentence = sentences[0] || context.substring(0, 200);
+        let maxMatches = 0;
+
+        for (const sentence of sentences) {
+            const sentenceLower = sentence.toLowerCase();
+            const matches = questionWords.filter(word => sentenceLower.includes(word)).length;
+            if (matches > maxMatches) {
+                maxMatches = matches;
+                bestSentence = sentence;
+            }
+        }
+
+        return `Based on the resume: ${bestSentence.trim()}. Would you like me to elaborate on any specific aspect?`;
     }
 
     /**
@@ -136,21 +219,11 @@ ${context}`;
         question: string,
         answer: string
     ): void {
-        const history = this.getConversationHistory(conversationId);
+        const history = this.conversations.get(conversationId) || [];
 
-        // Add user question
-        history.push({
-            role: 'user',
-            parts: question,
-        });
+        history.push({ role: 'user', content: question });
+        history.push({ role: 'assistant', content: answer });
 
-        // Add model answer
-        history.push({
-            role: 'model',
-            parts: answer,
-        });
-
-        // Keep only last 10 messages (5 exchanges) to avoid context limit
         if (history.length > 10) {
             history.splice(0, history.length - 10);
         }
