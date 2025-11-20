@@ -1,0 +1,73 @@
+POSITION: Senior Full-Stack Developer
+
+COMPANY OVERVIEW
+We are a fast-growing SaaS company building next-generation enterprise software solutions. We're looking for an experienced Full-Stack Developer to join our engineering team and help scale our platform to serve millions of users.
+
+JOB DESCRIPTION
+We are seeking a talented Senior Full-Stack Developer with strong expertise in React, Node.js, and modern web technologies. The ideal candidate will have experience building scalable backend systems, designing RESTful APIs, and creating responsive user interfaces. You will work closely with product managers, designers, and other engineers to deliver high-quality features.
+
+REQUIRED QUALIFICATIONS
+
+Education:
+• Bachelor's degree in Computer Science or related field from an accredited state university
+• Preference for candidates from public universities (state schools)
+
+Experience:
+• 5+ years of professional software development experience
+• Strong expertise in React.js and modern frontend development
+• Extensive experience with Node.js and backend development
+• Proven experience with PostgreSQL or other relational databases
+• Experience building and maintaining RESTful APIs
+• Familiarity with cloud platforms (AWS, GCP, or Azure)
+
+Technical Skills:
+• Frontend: React.js, TypeScript, modern CSS frameworks
+• Backend: Node.js, Express.js or similar frameworks
+• Database: PostgreSQL (required), experience with query optimization
+• DevOps: Docker, Kubernetes, CI/CD pipelines
+• Cloud: AWS (EC2, S3, RDS, Lambda)
+• Version Control: Git, GitHub/GitLab
+
+Architecture & Design:
+• Experience with microservices architecture
+• Understanding of system design and scalability principles
+• Ability to design and architect backend systems
+• Experience with load balancing and caching strategies
+• Knowledge of security best practices
+
+PREFERRED QUALIFICATIONS
+• Experience with Kubernetes and container orchestration
+• Knowledge of GraphQL
+• Experience with message queues (RabbitMQ, Kafka)
+• Familiarity with monitoring tools (DataDog, New Relic)
+• Open-source contributions
+• Experience leading technical projects or mentoring junior developers
+
+RESPONSIBILITIES
+• Design and develop scalable backend services using Node.js
+• Build responsive, performant frontend applications using React
+• Write clean, maintainable, and well-documented code
+• Collaborate with cross-functional teams on feature development
+• Participate in code reviews and architectural discussions
+• Optimize application performance and database queries
+• Mentor junior developers and contribute to team growth
+• Stay up-to-date with emerging technologies and best practices
+
+WORK AUTHORIZATION
+• Must be authorized to work in the United States
+• We sponsor H1B visas for exceptional candidates
+
+WHAT WE OFFER
+• Competitive salary ($120K - $160K based on experience)
+• Health, dental, and vision insurance
+• 401(k) with company match
+• Flexible work arrangements (hybrid/remote options)
+• Professional development budget
+• Stock options
+• Collaborative and inclusive work environment
+
+LOCATION
+San Francisco, CA (Hybrid - 3 days in office, 2 days remote)
+
+HOW TO APPLY
+Please submit your resume and a brief cover letter explaining your interest in the role and relevant experience.

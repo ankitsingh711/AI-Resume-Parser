@@ -1,0 +1,188 @@
+.app {
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.app-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    color: #667eea;
+}
+
+.app-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* Error Banner */
+.error-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(245, 87, 108, 0.1);
+    border: 1px solid rgba(245, 87, 108, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--error-color);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.error-banner svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Upload Section */
+.upload-section {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.analyze-btn {
+    width: 100%;
+    max-width: 400px;
+    margin: 2rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+    padding: 1rem 2rem;
+}
+
+.analyze-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Analyzing State */
+.analyzing-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.analyzing-state .spinner {
+    margin: 0 auto 2rem;
+}
+
+.analyzing-state h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.analyzing-steps {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.step {
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--success-color);
+    font-weight: 500;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Results Section */
+.results-section {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.results-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.results-header .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.results-header svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app {
+        padding: 1rem 0;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .app-title {
+        font-size: 1.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .upload-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .analyze-btn {
+        font-size: 1rem;
+    }
+
+    .analyzing-state {
+        padding: 2rem 1rem;
+    }
+
+    .analyzing-state h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.5rem;
+    }
+
+    .app-subtitle {
+        font-size: 0.875rem;
+    }
+}

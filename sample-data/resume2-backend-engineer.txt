@@ -1,0 +1,66 @@
+SUMMARY
+Backend Engineer with 3 years of professional experience specializing in Node.js, API development, and cloud infrastructure. Self-taught programmer with a passion for building scalable backend systems. Experience with MongoDB, AWS, and microservices architecture.
+
+SKILLS
+Languages: JavaScript, TypeScript, Python
+Backend: Node.js (3 years), Express.js, Fastify, RESTful APIs
+Databases: MongoDB (3 years), MySQL, DynamoDB
+Cloud: AWS (EC2, Lambda, S3, CloudWatch), Serverless Framework
+DevOps: Docker, GitHub Actions, Jenkins
+Other: Redis, RabbitMQ, Elasticsearch
+
+WORK EXPERIENCE
+
+Backend Engineer
+StartupXYZ, Remote
+January 2022 – Present (2 years)
+• Developed and maintained Node.js microservices serving 100K+ daily active users
+• Built RESTful APIs for mobile and web applications
+• Implemented caching strategies using Redis improving response time by 50%
+• Worked with MongoDB for data persistence and aggregation pipelines
+• Deployed serverless functions on AWS Lambda
+• Participated in code reviews and technical design discussions
+
+Junior Backend Developer
+WebDev Solutions, San Francisco, CA
+June 2020 – December 2021 (1.5 years)
+• Developed Node.js APIs for client projects
+• Integrated third-party services (Stripe, SendGrid, Twilio)
+• Wrote unit tests and integration tests using Mocha and Chai
+• Collaborated with frontend team to design API contracts
+• Monitored application performance using AWS CloudWatch
+
+EDUCATION
+
+Self-Taught Developer
+Online Courses and Bootcamps
+2019 – 2020
+• Completed Full-Stack Web Development Bootcamp (Udemy)
+• Node.js Advanced Concepts
+• AWS Certified Solutions Architect Course
+
+High School Diploma
+Lincoln High School, Los Angeles, CA
+Graduated: 2019
+
+PROJECTS
+
+Task Management API
+• RESTful API built with Node.js and Express for task management
+• MongoDB for data storage with user authentication (JWT)
+• Deployed on AWS EC2 with Docker
+• GitHub: github.com/username/task-api
+
+URL Shortener Service
+• Built URL shortening service handling 10K+ requests/day
+• Used Redis for caching and analytics tracking
+• Serverless deployment on AWS Lambda
+
+CERTIFICATIONS
+• AWS Certified Cloud Practitioner (2023)
+
+ADDITIONAL INFORMATION
+• Work Authorization: H1B visa holder
+• Active on Stack Overflow (2000+ reputation)
+• Contributed to several open-source Node.js projects
+• Available for remote work

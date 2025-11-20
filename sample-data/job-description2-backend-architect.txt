@@ -1,0 +1,61 @@
+POSITION: Backend Architect
+
+ABOUT THE ROLE
+We are looking for an exceptional Backend Architect to lead the design and implementation of our next-generation distributed systems. This role requires deep expertise in backend technologies, cloud infrastructure, and system design at scale.
+
+REQUIRED QUALIFICATIONS
+
+Education & Experience:
+• Master's degree in Computer Science or equivalent (PhD preferred)
+• 8+ years of backend engineering experience
+• 3+ years in a senior or lead architect role
+
+Core Technical Skills:
+• Expert-level knowledge of Node.js, Python, or Go
+• Deep understanding of distributed systems and microservices
+• Advanced PostgreSQL knowledge (performance tuning, replication, sharding)
+• Kubernetes production experience (required)
+• Extensive AWS experience (EKS, RDS, ElastiCache, SQS, SNS)
+• Experience with service mesh (Istio, Linkerd)
+
+System Design:
+• Proven ability to design systems handling millions of concurrent users
+• Experience with event-driven architecture and message queues
+• Knowledge of CQRS and Event Sourcing patterns
+• Understanding of CAP theorem and consistency models
+• Experience with API gateway patterns and rate limiting
+
+Performance & Scalability:
+• Experience optimizing high-throughput systems (100K+ req/sec)
+• Database optimization and query tuning expertise
+• Caching strategies (Redis, Memcached)
+• Load balancing and auto-scaling configurations
+
+Security:
+• Deep understanding of authentication and authorization (OAuth2, JWT)
+• Experience implementing security best practices
+• Knowledge of encryption, secure communication, and data protection
+
+PREFERRED QUALIFICATIONS
+• Experience with infrastructure as code (Terraform, CloudFormation)
+• Knowledge of observability tools (Prometheus, Grafana, ELK stack)
+• Contributions to major open-source projects
+• Published technical papers or conference presentations
+• Experience with machine learning model deployment
+
+RESPONSIBILITIES
+• Design and architect scalable backend systems
+• Lead technical decision-making for infrastructure and platforms
+• Mentor senior engineers and conduct architecture reviews
+• Define best practices and coding standards
+• Evaluate and introduce new technologies
+• Collaborate with product and business stakeholders
+• Ensure system reliability, performance, and security
+
+SALARY & BENEFITS
+• Salary range: $180K - $250K + equity
+• Full benefits package
+• Unlimited PTO
+
+LOCATION
+New York, NY or Remote (US-based only)

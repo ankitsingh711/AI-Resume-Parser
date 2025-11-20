@@ -1,0 +1,61 @@
+PROFESSIONAL SUMMARY
+Senior Full-Stack Developer with 5+ years of hands-on experience building scalable web applications using modern JavaScript frameworks and backend technologies. Proven track record of delivering high-quality software solutions in fast-paced environments. Strong expertise in React, Node.js, and PostgreSQL with a focus on clean architecture and best practices.
+
+TECHNICAL SKILLS
+Programming Languages: JavaScript, TypeScript, Python, SQL
+Frontend: React.js (5 years), Redux, Next.js, HTML5, CSS3, Tailwind CSS
+Backend: Node.js (5 years), Express.js, NestJS, RESTful APIs, GraphQL
+Databases: PostgreSQL (4 years), MongoDB, Redis
+Cloud & DevOps: AWS (EC2, S3, Lambda), Docker, Git, CI/CD
+Tools: Jest, Webpack, Vite, Postman, VS Code
+
+PROFESSIONAL EXPERIENCE
+
+Senior Full-Stack Developer
+Tech Solutions Inc., Buffalo, NY
+March 2021 – Present (3 years)
+• Led development of enterprise SaaS platform serving 50,000+ users using React, Node.js, and PostgreSQL
+• Designed and implemented RESTful APIs handling 1M+ requests daily with 99.9% uptime
+• Architected microservices-based backend infrastructure reducing response time by 40%
+• Mentored team of 4 junior developers on best practices and code review
+• Implemented comprehensive test coverage (85%+) using Jest and React Testing Library
+
+Full-Stack Developer
+Digital Innovations LLC, Rochester, NY
+June 2019 – March 2021 (2 years)
+• Developed customer-facing web applications using React and Node.js
+• Built real-time features using WebSockets and Socket.io
+• Optimized database queries reducing load time by 60%
+• Collaborated with UX team to implement pixel-perfect responsive designs
+• Participated in Agile ceremonies and sprint planning
+
+EDUCATION
+
+Bachelor of Science in Computer Science
+State University of New York at Buffalo (SUNY Buffalo)
+Graduated: May 2019
+GPA: 3.7/4.0
+Relevant Coursework: Data Structures, Algorithms, Database Systems, Software Engineering
+
+CERTIFICATIONS
+• AWS Certified Developer – Associate (2022)
+• MongoDB Certified Developer (2021)
+
+PROJECTS
+
+E-commerce Platform (Personal Project)
+• Built full-stack e-commerce application with React frontend and Node.js backend
+• Integrated Stripe payment processing and JWT authentication
+• Deployed on AWS using EC2 and RDS (PostgreSQL)
+• Tech Stack: React, Node.js, Express, PostgreSQL, AWS, Docker
+
+Real-time Chat Application
+• Developed real-time messaging app using React and Socket.io
+• Implemented user authentication and message persistence
+• Tech Stack: React, Node.js, Socket.io, MongoDB
+
+ADDITIONAL INFORMATION
+• U.S. Citizen, authorized to work in the United States
+• Active contributor to open-source projects on GitHub
+• Regular participant in local tech meetups and hackathons
+• Fluent in English, conversational Spanish
