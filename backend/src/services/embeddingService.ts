@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface Embedding {
     vector: number[];
@@ -7,25 +7,27 @@ export interface Embedding {
 }
 
 export class EmbeddingService {
-    private openai: OpenAI;
-    private model: string = 'text-embedding-3-small';
+    private genAI: GoogleGenerativeAI;
+    private model: string = 'embedding-001';
 
     constructor(apiKey: string) {
-        this.openai = new OpenAI({ apiKey });
+        this.genAI = new GoogleGenerativeAI(apiKey);
     }
 
     /**
-     * Generate embedding for a single text
+     * Generate embedding for a single text using Gemini
      */
     async generateEmbedding(text: string): Promise<Embedding> {
         try {
-            const response = await this.openai.embeddings.create({
-                model: this.model,
-                input: text,
-            });
+            const model = this.genAI.getGenerativeModel({ model: this.model });
+            const result = await model.embedContent(text);
+
+            if (!result.embedding || !result.embedding.values) {
+                throw new Error('Invalid embedding response from Gemini');
+            }
 
             return {
-                vector: response.data[0].embedding,
+                vector: result.embedding.values,
                 text,
                 model: this.model,
             };
@@ -39,17 +41,26 @@ export class EmbeddingService {
      */
     async generateEmbeddings(texts: string[]): Promise<Embedding[]> {
         try {
-            // OpenAI API supports batch embeddings
-            const response = await this.openai.embeddings.create({
-                model: this.model,
-                input: texts,
-            });
+            const model = this.genAI.getGenerativeModel({ model: this.model });
 
-            return response.data.map((item, index) => ({
-                vector: item.embedding,
-                text: texts[index],
-                model: this.model,
-            }));
+            // Gemini embedContent works one at a time, so we'll batch them
+            const embeddings: Embedding[] = [];
+
+            for (let i = 0; i < texts.length; i++) {
+                const result = await model.embedContent(texts[i]);
+
+                if (!result.embedding || !result.embedding.values) {
+                    throw new Error(`Missing embedding for text at index ${i}`);
+                }
+
+                embeddings.push({
+                    vector: result.embedding.values,
+                    text: texts[i],
+                    model: this.model,
+                });
+            }
+
+            return embeddings;
         } catch (error) {
             throw new Error(`Failed to generate embeddings: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -59,8 +70,8 @@ export class EmbeddingService {
      * Get embedding dimensions for this model
      */
     getEmbeddingDimensions(): number {
-        // text-embedding-3-small has 1536 dimensions
-        return 1536;
+        // embedding-001 has 768 dimensions
+        return 768;
     }
 
     /**

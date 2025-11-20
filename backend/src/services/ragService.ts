@@ -1,9 +1,9 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VectorStore, SearchResult } from './vectorStore';
 
 export interface ChatMessage {
-    role: 'system' | 'user' | 'assistant';
-    content: string;
+    role: 'user' | 'model';
+    parts: string;
 }
 
 export interface RAGResponse {
@@ -18,14 +18,15 @@ export interface RAGResponse {
 
 /**
  * RAG Service implementing the full Retrieval-Augmented Generation flow
+ * Now using Google Gemini for generation
  */
 export class RAGService {
-    private openai: OpenAI;
+    private genAI: GoogleGenerativeAI;
     private vectorStore: VectorStore;
     private conversations: Map<string, ChatMessage[]> = new Map();
 
     constructor(apiKey: string, vectorStore: VectorStore) {
-        this.openai = new OpenAI({ apiKey });
+        this.genAI = new GoogleGenerativeAI(apiKey);
         this.vectorStore = vectorStore;
     }
 
@@ -48,18 +49,24 @@ export class RAGService {
             // Step 3: Get or create conversation history
             const conversationHistory = this.getConversationHistory(conversationId);
 
-            // Step 4: Build messages for LLM
-            const messages = this.buildMessages(question, context, conversationHistory);
+            // Step 4: Build system instruction with context
+            const systemInstruction = this.buildSystemInstruction(context);
 
-            // Step 5: Generate response using OpenAI
-            const completion = await this.openai.chat.completions.create({
-                model: 'gpt-4o-mini',
-                messages,
-                temperature: 0.3, // Lower temperature for more focused, factual responses
-                max_tokens: 500,
+            // Step 5: Generate response using Gemini
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-pro',
+                systemInstruction,
             });
 
-            const answer = completion.choices[0].message.content || 'No response generated';
+            // Convert history to Gemini format
+            const history = conversationHistory.map(msg => ({
+                role: msg.role,
+                parts: [{ text: msg.parts }],
+            }));
+
+            const chat = model.startChat({ history });
+            const result = await chat.sendMessage(question);
+            const answer = result.response.text();
 
             // Step 6: Update conversation history
             this.updateConversationHistory(conversationId, question, answer);
@@ -95,16 +102,10 @@ export class RAGService {
     }
 
     /**
-     * Build messages array for LLM
+     * Build system instruction for Gemini
      */
-    private buildMessages(
-        question: string,
-        context: string,
-        conversationHistory: ChatMessage[]
-    ): ChatMessage[] {
-        const systemMessage: ChatMessage = {
-            role: 'system',
-            content: `You are an expert HR assistant helping recruiters evaluate candidates. 
+    private buildSystemInstruction(context: string): string {
+        return `You are an expert HR assistant helping recruiters evaluate candidates. 
 
 Your task is to answer questions about a candidate based ONLY on the information provided in their resume context below.
 
@@ -117,16 +118,7 @@ IMPORTANT RULES:
 6. If you're uncertain, acknowledge it rather than guessing
 
 RESUME CONTEXT:
-${context}`,
-        };
-
-        const userMessage: ChatMessage = {
-            role: 'user',
-            content: question,
-        };
-
-        // Combine: system message + conversation history + current question
-        return [systemMessage, ...conversationHistory, userMessage];
+${context}`;
     }
 
     /**
@@ -149,13 +141,13 @@ ${context}`,
         // Add user question
         history.push({
             role: 'user',
-            content: question,
+            parts: question,
         });
 
-        // Add assistant answer
+        // Add model answer
         history.push({
-            role: 'assistant',
-            content: answer,
+            role: 'model',
+            parts: answer,
         });
 
         // Keep only last 10 messages (5 exchanges) to avoid context limit

@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface MatchAnalysis {
     matchScore: number;
@@ -8,39 +8,29 @@ export interface MatchAnalysis {
 }
 
 export class AnalysisService {
-    private openai: OpenAI;
+    private genAI: GoogleGenerativeAI;
 
     constructor(apiKey: string) {
-        this.openai = new OpenAI({ apiKey });
+        this.genAI = new GoogleGenerativeAI(apiKey);
     }
 
     /**
-     * Analyze resume against job description
+     * Analyze resume against job description using Gemini
      */
     async analyzeMatch(resumeText: string, jobDescriptionText: string): Promise<MatchAnalysis> {
         try {
             const prompt = this.buildAnalysisPrompt(resumeText, jobDescriptionText);
 
-            const completion = await this.openai.chat.completions.create({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are an expert technical recruiter and HR analyst. Analyze resumes objectively and provide detailed, actionable insights.',
-                    },
-                    {
-                        role: 'user',
-                        content: prompt,
-                    },
-                ],
-                temperature: 0.3,
-                response_format: { type: 'json_object' },
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-pro',
+                generationConfig: {
+                    temperature: 0.3,
+                    responseMimeType: 'application/json',
+                },
             });
 
-            const response = completion.choices[0].message.content;
-            if (!response) {
-                throw new Error('No response from OpenAI');
-            }
+            const result = await model.generateContent(prompt);
+            const response = result.response.text();
 
             const analysis = JSON.parse(response);
 
@@ -108,7 +98,7 @@ ANALYSIS GUIDELINES:
     }
 
     /**
-     * Extract key information from resume
+     * Extract key information from resume using Gemini
      */
     async extractResumeInfo(resumeText: string): Promise<{
         skills: string[];
@@ -130,26 +120,16 @@ Return JSON in this exact format:
   "summary": "Brief 1-2 sentence summary of the candidate"
 }`;
 
-            const completion = await this.openai.chat.completions.create({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are an expert at parsing and extracting information from resumes.',
-                    },
-                    {
-                        role: 'user',
-                        content: prompt,
-                    },
-                ],
-                temperature: 0.2,
-                response_format: { type: 'json_object' },
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-pro',
+                generationConfig: {
+                    temperature: 0.2,
+                    responseMimeType: 'application/json',
+                },
             });
 
-            const response = completion.choices[0].message.content;
-            if (!response) {
-                throw new Error('No response from OpenAI');
-            }
+            const result = await model.generateContent(prompt);
+            const response = result.response.text();
 
             return JSON.parse(response);
         } catch (error) {

@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import uploadRoutes from './routes/uploadRoutes';
 import chatRoutes from './routes/chatRoutes';
+import testRoutes from './routes/testRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { EmbeddingService } from './services/embeddingService';
 import { VectorStore } from './services/vectorStore';
@@ -24,15 +25,15 @@ export function createApp(): Express {
     app.use(express.urlencoded({ extended: true }));
 
     // Validate required environment variables
-    if (!process.env.OPENAI_API_KEY) {
-        throw new Error('OPENAI_API_KEY environment variable is required');
+    if (!process.env.GEMINI_API_KEY) {
+        throw new Error('GEMINI_API_KEY environment variable is required');
     }
 
-    // Initialize services
-    const embeddingService = new EmbeddingService(process.env.OPENAI_API_KEY);
+    // Initialize services with Google Gemini
+    const embeddingService = new EmbeddingService(process.env.GEMINI_API_KEY);
     const vectorStore = new VectorStore(embeddingService);
-    const ragService = new RAGService(process.env.OPENAI_API_KEY, vectorStore);
-    const analysisService = new AnalysisService(process.env.OPENAI_API_KEY);
+    const ragService = new RAGService(process.env.GEMINI_API_KEY, vectorStore);
+    const analysisService = new AnalysisService(process.env.GEMINI_API_KEY);
 
     // Make services available to routes
     app.locals.embeddingService = embeddingService;
@@ -43,6 +44,7 @@ export function createApp(): Express {
     // Routes
     app.use('/api/upload', uploadRoutes);
     app.use('/api/chat', chatRoutes);
+    app.use('/api/test', testRoutes);
 
     // Health check
     app.get('/api/health', (_req, res) => {
@@ -51,6 +53,7 @@ export function createApp(): Express {
             status: 'ok',
             timestamp: new Date().toISOString(),
             vectorStore: stats,
+            ai: 'Google Gemini Pro',
         });
     });
 
